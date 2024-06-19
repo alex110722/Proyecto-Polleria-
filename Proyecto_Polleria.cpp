@@ -48,3 +48,10 @@ int main(){
 		
 	return 0;
 }
+
+//4 trabajores fijos
+//struct cliente (nombre, dni, fecha de nacimiento, puntos (ofertas))
+//struct stock (nombre del producto (pollo, porción de papas (gramos), bebidas)
+//struct precios 
+//
+
