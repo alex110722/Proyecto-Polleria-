@@ -1,6 +1,8 @@
 #include<iostream>
 #include<string.h>
+#include<windows.h>
 #include<locale.h>
+#include<fstream>
 
 using namespace std;
 
@@ -8,43 +10,34 @@ void interfazCliente();
 void interfazTrabajador();
 
 struct cliente{
-	char nombre_Cliente[30];
-	char documento_Cliente[10];
+	char nombre_Cliente[25];
+	char documento_Cliente[9];
 	int puntos;	
 	int consumo;
-}
-cliente1,
-cliente2,
-cliente3,
-cliente4,
-cliente5,
-cliente6,
-cliente7,
-cliente8,
-cliente9,
-cliente10;
+};
 
 struct menu{
+	int numero;
     char descripcion[25];
     float precio;  
 }
-plato1={"1 pollo",47.00},
-plato2={"1/2 pollo",23.00},
-plato3={"1/4 pollo",12.00},
-plato4={"1/8 pollo",8.00},
-plato5={"porción de papas",15.00},
-plato6={"1/2 porción de papas",10.00},
-plato7={"ensalada",10.00},
-bebida1={"gaseosa 3L",13.00},
-bebida2={"limonada frozen 1L",15.00},
-bebida3={"chicha 1L",15.00};
+plato1={1,"1 pollo",47.00},
+plato2={2,"1/2 pollo",23.00},
+plato3={3,"1/4 pollo",12.00},
+plato4={4,"1/8 pollo",8.00},
+plato5={5,"porción de papas",15.00},
+plato6={6,"1/2 porción de papas",10.00},
+plato7={7,"ensalada",10.00},
+bebida1={8,"gaseosa 3L",13.00},
+bebida2={9,"limonada frozen 1L",15.00},
+bebida3={10,"chicha 1L",15.00};
 
 struct trabajador{
-	char nombre_Trabajador[30];
+	char nombre_Trabajador[25];
 	char documento_Trabajador[10];		
-	char user[20];
+	char user[15];
 	char contrasena[6];
-	char cargo[15];	
+	char cargo[12];	
 }
 trabajador1={"Pepe Quintana","32356489","pepequin","6489","gerente"},
 trabajador2={"Alexandra Vargas","56236979","alexvar","6979","subgerente"},
@@ -66,11 +59,9 @@ producto7={"maíz morado",20000},
 producto8={"azúcar",10000};
 
 int main(){
-	setlocale(LC_ALL, "");
+	setlocale(LC_CTYPE, "Spanish");
 	char identificacion[10];
 	bool error=false;
-	cliente clientes[10] = {cliente1,cliente2,cliente3,cliente4,cliente5,cliente6,cliente7,cliente8,cliente9,cliente10};
-	menu carta[10] = {plato1,plato2,plato3,plato4,plato5,plato6,plato7,bebida1,bebida2,bebida3}; 
 	trabajador trabajadores[5] = {trabajador1,trabajador2,trabajador3,trabajador4,trabajador5};
 	stock productos[9] = {producto1,producto2,producto3,producto4,producto5,producto6,producto7,producto8};
 	
@@ -81,7 +72,7 @@ int main(){
     interfazCliente();	
 	}
     else if(strcmp(identificacion, "trabajador") == 0 || strcmp(identificacion, "Trabajador") == 0){
-    	
+    interfazTrabajador();	
 	}else{
             error = true;
             cout << "Identificación no válida. Inténtelo de nuevo.\n";
@@ -93,23 +84,58 @@ int main(){
 }
 
 void interfazCliente(){
-	bool error=false;
-	do{
-    cout<<"Por favor ingrese su nombre: "
-	}while(error);
-
-	cout<<"Nuestra carta es: "<<endl;
-	cout<<"Platillos"<<"\t"<<"Precio\n";
+	setlocale(LC_CTYPE, "Spanish");
+	ofstream es("Datos_de_los_clientes.txt", ios_base::out | ios_base::app);
+    if (!es.is_open()) {
+        cerr << "Error al abrir el archivo." << endl;
+        return;
+    }
+    int pedido;
+    char respuesta;
+	cliente x;
+	menu carta[10] = {plato1,plato2,plato3,plato4,plato5,plato6,plato7,bebida1,bebida2,bebida3}; 
+	float cuenta=0.0;
+    
+    cout<<"Ingrese su nombre: ";
+    cin.ignore();
+    gets(x.nombre_Cliente);
+    cout<<"Ingrese su documento: ";
+    gets(x.documento_Cliente);
+    cout << "Datos almacenados correctamente." << endl;
+    cout<<"<------Bienvenido "<<x.nombre_Cliente<<"------>"<<endl;
+	cout<<"Nuestra carta: "<<endl;
+	cout<<"Platillos"<<"\t"<<"\t"<<"Precio\n";
 	for(int i=0;i<10;i++){
-	cout<<carta[i].descripcion<<"\t"<<carta[i].precio<<"\n";
+		if(strlen(carta[i].descripcion)>15)
+	    cout<<i+1<<"."<<carta[i].descripcion<<"\t"<<carta[i].precio<<"\n";
+	    else
+	    cout<<i+1<<"."<<carta[i].descripcion<<"\t"<<"\t"<<carta[i].precio<<"\n";
 	}
+	do{
+		cout<<"¿Qué desea pedir?\n";
+		cin>>pedido;
+		for(int i=0;i<10;i++){
+			if(carta[i].numero==pedido){
+			cuenta+=carta[i].precio;	
+			}
+		}
+        cout << "¿Desea añadir algo más? (s/n): ";
+        cin >> respuesta;
+	}while(respuesta == 's' || respuesta == 'S');
+	cout<<"El monto total a pagar será s/."<<cuenta;
+	x.consumo++;  
+	es << "Nombre del cliente" << "\t" << "\t" << "Documento" << "\t" << "\t" << "N° de consumos" <<endl;	  
+	es << x.nombre_Cliente <<" \t "<<" \t "<< x.documento_Cliente <<" \t "<<" \t "<< x.consumo <<endl;
+    es.close();
 }
 
 void interfazTrabajador(){
-	
+	setlocale(LC_CTYPE, "Spanish");
+	cout<<"Estamos trabajando...";
 	
 	
 }
+
 
 
 
