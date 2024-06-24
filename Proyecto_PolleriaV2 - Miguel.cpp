@@ -1,3 +1,9 @@
+
+
+//Todavia esta incompleta la parte de inciar sesion
+
+
+
 #include <iostream>
 #include <string>
 #include <cstring>
