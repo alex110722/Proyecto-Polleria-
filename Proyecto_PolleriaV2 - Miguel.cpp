@@ -1,3 +1,7 @@
+//Falta la interfaz del trabajador y la interfaz de compra del cliente
+
+
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -5,10 +9,14 @@
 #include <locale.h>
 #include <fstream>
 #include <cctype>
+#include <iomanip>
 
 using namespace std;
 
+
 bool comprobarcarac(char [], int);
+void interfazcarta();
+void interfazClientePrincipal(char []);
 void sesionUsuario();
 void registroUsuario();
 void interfazCliente();
@@ -26,18 +34,20 @@ struct cliente {
 
 struct menu {
     int numero;
-    char descripcion[25];
+    char descripcion[75];
     float precio;
-} plato1 = {1, "1 pollo", 47.00},
-  plato2 = {2, "1/2 pollo", 23.00},
-  plato3 = {3, "1/4 pollo", 12.00},
-  plato4 = {4, "1/8 pollo", 8.00},
-  plato5 = {5, "porción de papas", 15.00},
-  plato6 = {6, "1/2 porción de papas", 10.00},
-  plato7 = {7, "ensalada", 10.00},
-  bebida1 = {8, "gaseosa 3L", 13.00},
-  bebida2 = {9, "limonada frozen 1L", 15.00},
-  bebida3 = {10, "chicha 1L", 15.00};
+} plato1 = {1, "1 POLLO + PAPAS FAMILIARES + ENSALADA FAMILIAR + GASEOSA 1.5L", 53.90},
+  plato2 = {2, "1/2 POLLO + PAPAS MEDIANAS + ENSALADA MEDIANA + 2 GASEOSAS PERSONALES", 35.90},
+  plato3 = {3, "1/4 DE POLLO + PAPAS PERSONALES + ENSALADA PERSONAL + GASEOSA PERSONAL", 15.90},
+  plato4 = {4, "1/8 DE POLLO + PAPAS PERSONALES + ENSALADA PERSONAL", 8.90},
+  adicional1 = {5, "1/4 DE POLLO", 15.90},
+  adicional2 = {6, "PORCIÓN DE PAPAS FAMILIARES", 14.90},
+  adicional3 = {7, "1/2 PORCIÓN DE PAPAS FAMILIARES", 9.90},
+  adicional4 = {8, "ENSALADA CLÁSICA", 10.00},
+  adicional5 = {9, "ENSALADA DE PALTA", 10.00},
+  bebida1 = {10, "GASEOSA 3L", 13.00},
+  bebida2 = {11, "LIMONADA FROZEN 1L", 15.00},
+  bebida3 = {12, "CHICHA MORADA 1L", 15.00};
 
 struct trabajador {
     char nombre_Trabajador[25];
@@ -140,59 +150,63 @@ void sesionUsuario() {
     bool correcto = false;
     ifstream sm("Datos_de_los_clientes.txt", ios_base::in);
     if (!sm.is_open()) {
-        cerr << "Error al abrir el archivo." << endl;
+        cout << "Error al abrir el archivo." << endl;
         return;
     }
-    cin.ignore();
-    while (!correcto) {
-        h = 0; // Reiniciar el indicador de usuario encontrado
-        cout << "Ingrese su usuario (10 caracteres): ";
-        gets(y.usuario_Cliente);
-        while (comprobarcarac(y.usuario_Cliente, 10) == false) {
-            cout << "\nUsuario no válido (solo 10 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
-            gets(y.usuario_Cliente);
-        }
-        sm.clear();
-        sm.seekg(0);
-        while (!sm.eof() && h == 0) {
-            getline(sm, us, '|');
-            strcpy(usc, us.c_str());
-            if (strcmp(usc, y.usuario_Cliente) == 0) {
-                h++;
-                getline(sm, us, '|'); // Leer la contraseña
-                strcpy(con, us.c_str()); // Almacenar la contraseña leída
-                getline(sm, us); // Leer el resto de la línea
-            } else {
-                getline(sm, us); // Leer el resto de la línea si el usuario no coincide
-            }
-        }
-        if (h == 0) {
-            cout << "No existe el usuario\n";
-            continue;
-        }
-        
-        cout << "Ingrese su contraseña: ";
-        gets(y.contrasena_Cliente);
-        while (comprobarcarac(y.contrasena_Cliente, 8) == false) {
-            cout << "\nContraseña no válida (solo 8 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
-            gets(y.contrasena_Cliente);
-            cout << "\n";
-        }
-        
-        if (strcmp(con, y.contrasena_Cliente) == 0) {
-            cout << "Inicio de sesión exitoso.\n";
-            correcto = true;
-        } else {
-            cout << "Contraseña incorrecta.\n";
-            correcto = false;
-        }
-    }
-    sm.close();
+    else{
+	    cin.ignore();
+	    while (!correcto) {
+	        h = 0; // Reiniciar el indicador de usuario encontrado
+	        cout << "Ingrese su usuario (10 caracteres): ";
+	        gets(y.usuario_Cliente);
+	        while (comprobarcarac(y.usuario_Cliente, 10) == false) {
+	            cout << "\nUsuario no válido (solo 10 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
+	            gets(y.usuario_Cliente);
+	        }
+	        sm.clear();
+	        sm.seekg(0);
+	        while (!sm.eof() && h == 0) {
+	            getline(sm, us, '|');
+	            strcpy(usc, us.c_str());
+	            if (strcmp(usc, y.usuario_Cliente) == 0) {
+	                h++;
+	                getline(sm, us, '|'); // Leer la contraseña
+	                strcpy(con, us.c_str()); // Almacenar la contraseña leída
+	                getline(sm, us); // Leer el resto de la línea
+	            } else {
+	                getline(sm, us); // Leer el resto de la línea si el usuario no coincide
+	            }
+	        }
+	        if (h == 0) {
+	            cout << "No existe el usuario\n";
+	            continue;
+	        }
+	        
+	        cout << "Ingrese su contraseña (8 caracteres): ";
+	        gets(y.contrasena_Cliente);
+	        while (comprobarcarac(y.contrasena_Cliente, 8) == false) {
+	            cout << "\nContraseña no válida (solo 8 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
+	            gets(y.contrasena_Cliente);
+	            cout << "\n";
+	        }
+	        
+	        if (strcmp(con, y.contrasena_Cliente) == 0) {
+	            cout << "Inicio de sesión exitoso.\n";
+	             system("pause");
+	            system("cls");
+	            interfazClientePrincipal(usc);
+	            correcto = true;
+	        } else {
+	            cout << "Contraseña incorrecta.\n";
+	            correcto = false;
+	        }
+	    }
+	    sm.close();
+	}
 }
 
-//Interfaz para el inicio de sesion
+//Interfaz para el registro
 void registroUsuario() {
-    setlocale(LC_CTYPE, "Spanish");
     ofstream es("Datos_de_los_clientes.txt", ios_base::app);
     if (!es.is_open()) {
         cout << "Error al abrir el archivo." << endl;
@@ -229,7 +243,7 @@ void registroUsuario() {
     }
     do {
         h = 1;
-        cout << "Ingrese su usuario: ";
+        cout << "Ingrese su usuario (10 caracteres): ";
         gets(x.usuario_Cliente);
         while (comprobarcarac(x.usuario_Cliente, 10) == false) {
             cout << "\nUsuario no válido (solo 10 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
@@ -250,7 +264,7 @@ void registroUsuario() {
             cout<<endl;
         }
     } while (h == 0);
-    cout << "Ingrese su contraseña: ";
+    cout << "Ingrese su contraseña (8 caracteres): ";
     gets(x.contrasena_Cliente);
     while (comprobarcarac(x.contrasena_Cliente, 8) == false) {
         cout << "\nContraseña no válida (solo 8 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
@@ -262,6 +276,125 @@ void registroUsuario() {
     es << x.usuario_Cliente << "|" << x.contrasena_Cliente << "|" << x.nombre_Cliente << "|" << x.apellidos_Cliente << "|" << x.documento_Cliente << "|" << x.puntos << "|" << x.consumo << "|" << endl;
     es.close();
     ms.close();
+}
+
+//Interfaz para el cliente despues de inciar sesión
+void interfazClientePrincipal(char x[]) {
+    cliente y;
+    string aux;
+    int opciones, h=0;
+    bool encontrado = false, error;
+    ifstream dat("Datos_de_los_clientes.txt", ios_base::in);
+    if (!dat.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        return;
+    } else {
+        while (!dat.eof() && !encontrado) {
+            getline(dat, aux, '|');
+            if (strcmp(aux.c_str(), x) == 0) {
+                encontrado = true;
+                // Leer el resto de los datos del cliente
+                getline(dat, aux, '|'); // Leer la contraseña
+                getline(dat, aux, '|'); // Leer el nombre
+                strcpy(y.nombre_Cliente, aux.c_str());
+                getline(dat, aux, '|'); // Leer los apellidos
+                strcpy(y.apellidos_Cliente, aux.c_str());
+                getline(dat, aux, '|'); // Leer el documento
+                strcpy(y.documento_Cliente, aux.c_str());
+                getline(dat, aux, '|'); // Leer los puntos
+                y.puntos = atoi(aux.c_str());
+                getline(dat, aux, '|'); // Leer el consumo
+                y.consumo = atoi(aux.c_str());
+            } else {
+                getline(dat, aux); // Leer el resto de la línea si el usuario no coincide
+            }
+        }
+        if (encontrado) {
+        	do {
+        	cout << "Bienvenido " << y.nombre_Cliente << endl;
+        	cout << "Elija la opción que desee: "<< endl;
+        	cout << "1. Carta: " << endl;
+            cout << "2. Comprar: " << endl;
+            cout << "3. Información del usuario: " << endl;
+        	cout << "4. Salir: " << endl;
+	        	do {
+	            cin >> opciones;
+	            if (opciones == 1) {
+		            	system("cls");
+		            	interfazcarta();
+		            	system("cls");
+		            	error = false;
+		            } else if (opciones == 2) {
+		                system("cls");
+		                //registroUsuario();
+		                system("cls");
+		                error = false;
+		            } else if (opciones == 3) {
+		            	system("cls");
+		                cout << "Nombre: " << y.nombre_Cliente << endl;
+		            	cout << "Apellidos: " << y.apellidos_Cliente << endl;
+		            	cout << "Documento: " << y.documento_Cliente << endl;
+		            	cout << "Puntos: " << y.puntos << endl;
+		            	cout << "Consumo: " << y.consumo << endl;
+		            	system("pause");
+		            	system("cls");
+		                error = false;
+		            } else if (opciones == 4) {
+		                cout << "Gracias por su preferencia." << endl;
+		                error = false;
+		                h++;
+		            } else {
+		                error = true;
+		                cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+		            }
+	        	} while (error);
+	        } while (h==0);
+        } 
+		else
+            cout << "Usuario no encontrado." << endl;
+    }
+    dat.close();
+}
+
+//Interfaz para la carta
+void interfazcarta() {
+    menu carta[12] = {plato1, plato2, plato3, plato4, adicional1, adicional2, adicional3, adicional4, adicional5, bebida1, bebida2, bebida3};
+    cout << "PLATOS PRINCIPALES:" << endl;
+    cout << setw(85) << setfill('-') << "" << endl; // Línea divisoria
+    cout << left << setw(75) << "Platillos:" << right << setw(10) << "Precio:" << endl;
+    cout << "\n";
+    for (int i = 0; i < 4; i++) {
+        cout << "Platillo " << i + 1 << ":" << endl;
+        cout << left << setw(75) << setfill(' ') << carta[i].descripcion 
+             << right << setw(7) << "S/." 
+             << setw(4) << fixed << setprecision(2) << carta[i].precio << endl;
+        cout << "\n";
+    }
+    cout << "\n";
+    cout << "PLATOS ADICIONALES :" << endl;
+    cout << setw(85) << setfill('-') << "" << endl; // Línea divisoria
+    cout << left << setw(75) << "Platillos:" << right << setw(10) << "Precio:" << endl;
+    cout << "\n";
+    for (int i = 4; i < 9; i++) {
+        cout << "Platillo " << i << ":" << endl;
+        cout << left << setw(75) << setfill(' ') << carta[i].descripcion 
+             << right << setw(7) << "S/." 
+             << setw(4) << fixed << setprecision(2) << carta[i].precio << endl;
+        cout << "\n";
+    }
+     cout << "\n";
+    cout << "BEBIDAS :" << endl;
+    cout << setw(85) << setfill('-') << "" << endl; // Línea divisoria
+    cout << left << setw(75) << "Platillos:" << right << setw(10) << "Precio:" << endl;
+    cout << "\n";
+    for (int i = 4; i < 9; i++) {
+        cout << "Platillo " << i << ":" << endl;
+        cout << left << setw(75) << setfill(' ') << carta[i].descripcion 
+             << right << setw(7) << "S/." 
+             << setw(4) << fixed << setprecision(2) << carta[i].precio << endl;
+        cout << "\n";
+    }
+    system("pause");
 }
 
 //Función para comprobar la longitud y el uso de algunos caracteres
@@ -295,6 +428,5 @@ bool comprobarcarac(char x[], int n) {
 
 
 void interfazTrabajador() {
-    setlocale(LC_CTYPE, "Spanish");
     cout << "Estamos trabajando..." << endl;
 }
