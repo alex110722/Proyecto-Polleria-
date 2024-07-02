@@ -1,4 +1,6 @@
-//Falta la interfaz del trabajador
+
+//Falta las funciones de los trabajadores dependiendo del cargo
+
 
 
 
@@ -24,8 +26,9 @@ struct cliente {
 };
 
 struct polleria {
-    int puntaje;
-    int ingresos;
+	float ingresos;
+	float puntaje;
+    int cantpuntaje;
 };
 
 struct menu {
@@ -46,17 +49,15 @@ struct menu {
   bebida3 = {12, "CHICHA MORADA 1L", 15.00};
 
 struct trabajador {
-    char nombre_Trabajador[25];
-    char documento_Trabajador[10];
-    char user[15];
-    char contrasena[6];
-    char cargo[12];
+    char nombre_Trabajador[30];
+    char apellidos_Trabajador[30];
+    char documento_Trabajador[9];
+    char usuario_Trabajador[11];
+    char contrasena_Trabajador[9];
+    char cargo[16];
     
-} trabajador1 = {"Pepe Quintana", "32356489", "pepequin", "6489", "gerente"},
-  trabajador2 = {"Alexandra Vargas", "56236979", "alexvar", "6979", "subgerente"},
-  trabajador3 = {"Diego Aguilar", "45638679", "diegoagui", "8679", "mozo"},
-  trabajador4 = {"Gerardo Carrillo", "71556889", "gerardoca", "6889", "mozo"},
-  trabajador5 = {"Mariana Mendoza", "23132565", "marianamen", "2565", "mozo"};
+} trabajador1 = {"Luis Alfredo","Paredes Quintana", "32356489", "Luisparqui", "12345670", "Gerente"},
+  trabajador2 = {"Claudia Elisa","Vargas Lopez", "56236979", "Clauvarlop", "12345671", "Subgerente"};
 
 struct stock {
     char nomProducto[15];
@@ -71,6 +72,8 @@ struct stock {
   producto8 = {"azúcar", 10000};
 
 bool comprobarcarac(char [], int);
+void puntosD(cliente &, float &);
+bool actualizardatosP(polleria, char);
 void copiarLineas(string [], cliente , int , int );
 int contarLineas(ifstream &);
 int buscarLinea(char [], ifstream &);
@@ -80,7 +83,9 @@ void interfazClientePrincipal(char []);
 void sesionUsuario();
 void registroUsuario();
 void interfazCliente();
+bool existeArchivo();
 void interfazTrabajador();
+void interfazsesionTrabajador();
 
 
 //Interfaz para seleccionar si es cliente o trabajador
@@ -88,9 +93,7 @@ int main() {
     setlocale(LC_CTYPE, "Spanish");
     char identificacion[10];
     bool error = false;
-    trabajador trabajadores[5] = {trabajador1, trabajador2, trabajador3, trabajador4, trabajador5};
-    stock productos[9] = {producto1, producto2, producto3, producto4, producto5, producto6, producto7, producto8};
-
+    
     cout << "Ingrese su identificación o Salir para finalizar el programa" << endl;
     cout << "- Cliente" << endl;
     cout << "- Trabajador" << endl;
@@ -105,6 +108,7 @@ int main() {
             interfazCliente();
             error = false;
         } else if (strcmp(identificacion, "TRABAJADOR") == 0) {
+        	system("cls");
             interfazTrabajador();
             error = false;
         } else if (strcmp(identificacion, "SALIR") == 0) {
@@ -286,7 +290,7 @@ void registroUsuario() {
     
     cout << "Usuario Registrado\n";
     system("pause");
-    es <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+    es <<" USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
     es << x.usuario_Cliente << "|" << x.contrasena_Cliente << "|" << x.nombre_Cliente << "|" << x.apellidos_Cliente << "|" << x.documento_Cliente << "|" << x.puntos << "|" << x.consumo << "|" << endl;
     es.close();
     ms.close();
@@ -605,22 +609,30 @@ void interfazClienteCompra(char x[]){
 		} while (error2);
 		cout << "El total es de: S/."<< fixed << setprecision(2) << total << endl;
 		if (total>=75)
-		y.puntos++;
+			y.puntos++;
 		y.consumo++;
+		if (y.puntos>=5)
+			puntosD(y, total);
+		p.ingresos=total;
 		cout << "¿Desea calificarnos? (s/n): ";
 		    do {
 		        cin>>s_n;;
 		        if ('S' == toupper(s_n)) {
 		        	x2=1;
 		        	cout << "Ingrese una puntuación del 1 al 5: "<< endl;
-		        	cin>>opciones;
-		        		while (opciones<1 || opciones>5){
+		        	cin>>p.puntaje;
+		        	while (p.puntaje<1 || p.puntaje>5){
 						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
-						cin>>opciones;
+						cin>>p.puntaje;
 						cout << "\n";
+					}
+					while (actualizardatosP(p, s_n) == false){
 					}
 			    	error = false;
 			    } else if ('N' == toupper(s_n)) {
+			    	while (actualizardatosP(p, s_n) == false){
+						}
+					cout << "\n";
 			        cout << endl;
 			        error = false;
 			    } else {
@@ -645,24 +657,82 @@ int contarLineas(ifstream &y){
 	return lineas-1;
 }
 
+bool actualizardatosP(polleria p, char s){
+	string aux;
+	polleria paux;
+	bool existe;
+	ifstream datp("Datos_de_la_polleria.txt", ios_base::in);
+    if (!datp.is_open()) {
+        ofstream es("Datos_de_la_polleria.txt", ios_base::app);
+        if (!es.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        datp.close();
+        return true;
+    	}
+    	es <<" GANANCIAS "<< "|" <<" PUNTUACIÓN "<< "|" <<" N° PUNTUACIONES " <<"|" << endl;
+        es << "0|0|0|" << endl;
+        es.close();
+        return false;
+    } else {
+    	getline(datp, aux);
+        getline(datp, aux, '|');
+    	paux.ingresos = atof(aux.c_str());
+    	getline(datp, aux, '|');
+    	paux.puntaje = atof(aux.c_str());
+    	getline(datp, aux, '|');
+    	paux.cantpuntaje = atoi(aux.c_str());
+    	getline(datp, aux);
+    	paux.ingresos = paux.ingresos + p.ingresos;
+    	if ('S'== toupper(s)){
+			paux.cantpuntaje++;
+			paux.puntaje=(paux.puntaje*(paux.cantpuntaje-1)+p.puntaje)/paux.cantpuntaje;
+			ofstream es("Datos_de_la_polleria.txt", ios_base::trunc);
+			 if (!es.is_open()) {
+	        	cout << "Error al abrir y editar el archivo ." << endl;
+	    	} else {
+	    		es <<" GANANCIAS "<< "|" <<" PUNTUACIÓN "<< "|" <<" N° PUNTUACIONES " <<"|" << endl;
+	    		es <<paux.ingresos<< "|" << fixed << setprecision(2) << paux.puntaje<< "|" <<paux.cantpuntaje<<"|" << endl;
+	    		es.close();
+			}
+			datp.close();
+			cout << "Gracias por su valoración" << endl;
+		}
+		else if ('N'== toupper(s)){
+			ofstream es("Datos_de_la_polleria.txt", ios_base::trunc);
+			 if (!es.is_open()) {
+	        	cout << "Error al abrir y editar el archivo ." << endl;
+	    	} else {
+	    		es <<" GANANCIAS "<< "|" <<" PUNTUACIÓN "<< "|" <<" N° PUNTUACIONES " <<"|" << endl;
+	    		es <<paux.ingresos<< "|" << fixed << setprecision(2) << paux.puntaje<< "|" <<paux.cantpuntaje<<"|" << endl;
+	    		es.close();
+			}
+			datp.close();
+			cout << "Gracias por su compra." << endl;
+		}
+		return true;
+	}
+}
+
+
 void copiarLineas(string aux[], cliente y, int nl, int nt){
 	ofstream newdat("Datos_de_los_clientes.txt", ios_base::trunc);
     if (!newdat.is_open()) {
         cout << "Error al abrir el archivo." << endl;
     } else {
     	for (int i = 0; i < nl-1; i++) {
-    		newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+    		newdat <<" USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
             newdat << aux[i] << endl;
         }
         
-        newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+        newdat <<" USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
         newdat << y.usuario_Cliente << "|" << y.contrasena_Cliente << "|" << y.nombre_Cliente << "|" << y.apellidos_Cliente << "|" << y.documento_Cliente << "|" << y.puntos << "|" << y.consumo << "|" << endl;
         
 		for (int i = nl; i < nt; i++) {
-        	newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+        	newdat <<" USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
             newdat << aux[i] << endl;
     	}
 }
+newdat.close();
 }
 
 int buscarLinea(char x[], ifstream &y) {
@@ -685,6 +755,48 @@ int buscarLinea(char x[], ifstream &y) {
     else
     return -1; // Devuelve -1 si no se encontró la línea
 }
+
+void puntosD(cliente &x, float &total) {
+	bool error;
+	int aux, op;
+	char s_n;
+	cout << "¿Desea usar sus puntos para un descuento? (s/n): ";
+		do {
+		    cin>>s_n;;
+		    if ('S' == toupper(s_n)) {
+				aux=x.puntos/5;
+				if (aux>6)
+					aux=6;
+				cout << "\nTiene "<<x.puntos<<" puntos\n";
+				for (int i = 1; i <= aux; i++) {
+				cout <<i<<". "<<i*5<< left << setw(15) <<" puntos"<<i*10<<"% de descuento"<<endl;
+        		}
+        		if (aux==1)
+        		cout << "Escoja el descuento ("<<aux<<"): ";
+        		else 
+        		cout << "Escoja el descuento (1 - "<<aux<<"): ";
+        		cin>>op;
+		        while (op<1 || op>aux){
+					cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+					cin>>op;
+					cout << "\n";
+				}
+				x.puntos=x.puntos-op*5;
+				total=total-(total*op*0.10);
+				cout << "\nEl descuento se aplicó correctamente: \n";
+				cout << "El nuevo precio es de: S/."<< fixed << setprecision(2) <<total<<endl;
+				cout << "Sus puntos ahora son: "<<x.puntos<<endl;
+			    error = false;
+			} else if ('N' == toupper(s_n)) {
+			    cout << endl;
+			    error = false;
+			} else {
+			    error = true;
+			    cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			    }
+		    } while (error);
+}
+
 
 //Función para comprobar la longitud y el uso de algunos caracteres
 bool comprobarcarac(char x[], int n) {
@@ -716,6 +828,113 @@ bool comprobarcarac(char x[], int n) {
 }
 
 
+bool existeArchivo(){
+	trabajador y[2] = {trabajador1 , trabajador2};
+	ifstream datp("Datos_de_los_trabajadores.txt", ios_base::in);
+    if (!datp.is_open()) {
+        ofstream es("Datos_de_los_trabajadores.txt", ios_base::app);
+        if (!es.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        datp.close();
+        return true;
+    	}
+    	for (int i =0;  i<=1; i++){
+	    	es <<" USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " CARGO " <<"|" << endl;
+	        es << y[i].usuario_Trabajador<< "|" << y[i].contrasena_Trabajador << "|" << y[i].nombre_Trabajador << "|" << y[i].apellidos_Trabajador << "|" << y[i].documento_Trabajador << "|" << y[i].cargo << "|" << endl;
+		}
+		es.close();
+        return false;
+    } else {
+    	datp.close();
+    	return true;
+	}  
+}
+
 void interfazTrabajador() {
-    cout << "Estamos trabajando..." << endl;
+    setlocale(LC_CTYPE, "Spanish");
+    int opciones;
+    bool error = false;
+        cout << "Seleccione una opción: " << endl;
+        cout << "1. Iniciar Sesión" << endl;
+        cout << "2. Salir" << endl;
+        do {
+            cin >> opciones;
+            if (opciones == 1) {
+            	system("cls");
+            	interfazsesionTrabajador();
+            	error = false;
+            } else if (opciones == 2) {
+                cout << "Saliendo..." << endl;
+                error = false;
+            } else {
+                error = true;
+                cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+            }
+        } while (error);
+}
+
+void interfazsesionTrabajador(){
+	trabajador y;
+    int h = 0;
+    string us;
+    char usc[11];
+    char con[9];
+    bool correcto = false;
+    while (existeArchivo() == false){
+	}
+    ifstream sm("Datos_de_los_trabajadores.txt", ios_base::in);
+    if (!sm.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        return;
+    }
+    else{
+	    cin.ignore();
+	    while (!correcto) {
+	        h = 0; // Reiniciar el indicador de usuario encontrado
+	        cout << "Ingrese su usuario (10 caracteres): ";
+	        gets(y.usuario_Trabajador);
+	        while (comprobarcarac(y.usuario_Trabajador, 10) == false) {
+	            cout << "\nUsuario no válido (solo 10 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
+	            gets(y.usuario_Trabajador);
+	        }
+	        sm.clear();
+	        sm.seekg(0);
+	        while (!sm.eof() && h == 0) {
+	            getline(sm, us, '|');
+	            strcpy(usc, us.c_str());
+	            if (strcmp(usc, y.usuario_Trabajador) == 0) {
+	                h++;
+	                getline(sm, us, '|'); // Leer la contraseña
+	                strcpy(con, us.c_str()); // Almacenar la contraseña leída
+	                getline(sm, us); // Leer el resto de la línea
+	            } else {
+	                getline(sm, us); // Leer el resto de la línea si el usuario no coincide
+	            }
+	        }
+	        if (h == 0) {
+	            cout << "No existe el usuario\n";
+	            continue;
+	        }
+	        cout << "Ingrese su contraseña (8 caracteres): ";
+	        gets(y.contrasena_Trabajador);
+	        while (comprobarcarac(y.contrasena_Trabajador, 8) == false) {
+	            cout << "\nContraseña no válida (solo 8 caracteres, no espacios ni el caracter | ). Inténtelo de nuevo: \n";
+	            gets(y.contrasena_Trabajador);
+	            cout << "\n";
+	        }
+	        
+	        if (strcmp(con, y.contrasena_Trabajador) == 0) {
+	            cout << "Inicio de sesión exitoso.\n";
+	             system("pause");
+	            system("cls");
+	            //interfazClientePrincipal(usc);
+	            cout << "falta las opciones.\n";
+	            correcto = true;
+	        } else {
+	            cout << "Contraseña incorrecta.\n";
+	            correcto = false;
+	        }
+	    }
+	    sm.close();
+	}
 }
