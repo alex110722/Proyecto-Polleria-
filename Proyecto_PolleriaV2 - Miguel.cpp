@@ -1,4 +1,4 @@
-//Falta la interfaz del trabajador y la interfaz de compra del cliente
+//Falta la interfaz del trabajador
 
 
 
@@ -13,15 +13,6 @@
 
 using namespace std;
 
-
-bool comprobarcarac(char [], int);
-void interfazcarta();
-void interfazClientePrincipal(char []);
-void sesionUsuario();
-void registroUsuario();
-void interfazCliente();
-void interfazTrabajador();
-
 struct cliente {
     char nombre_Cliente[30];
     char apellidos_Cliente[30];
@@ -30,6 +21,11 @@ struct cliente {
     char contrasena_Cliente[9];
     int puntos;
     int consumo;
+};
+
+struct polleria {
+    int puntaje;
+    int ingresos;
 };
 
 struct menu {
@@ -74,6 +70,19 @@ struct stock {
   producto7 = {"maíz morado", 20000},
   producto8 = {"azúcar", 10000};
 
+bool comprobarcarac(char [], int);
+void copiarLineas(string [], cliente , int , int );
+int contarLineas(ifstream &);
+int buscarLinea(char [], ifstream &);
+void interfazClienteCompra(char []);
+void interfazcarta();
+void interfazClientePrincipal(char []);
+void sesionUsuario();
+void registroUsuario();
+void interfazCliente();
+void interfazTrabajador();
+
+
 //Interfaz para seleccionar si es cliente o trabajador
 int main() {
     setlocale(LC_CTYPE, "Spanish");
@@ -113,8 +122,9 @@ int main() {
 //Interfaz para el inicio de sesión o el registro del cliente
 void interfazCliente() {
     setlocale(LC_CTYPE, "Spanish");
-    int opciones;
-    bool error = false;
+    int opciones, h = 0;
+    bool error = false ;
+    	do{
         cout << "Seleccione una opción: " << endl;
         cout << "1. Iniciar Sesión" << endl;
         cout << "2. Registrarse" << endl;
@@ -122,6 +132,7 @@ void interfazCliente() {
         do {
             cin >> opciones;
             if (opciones == 1) {
+            	h++;
             	system("cls");
             	sesionUsuario();
             	error = false;
@@ -132,12 +143,14 @@ void interfazCliente() {
                 error = false;
             } else if (opciones == 3) {
                 cout << "Gracias por su preferencia." << endl;
+                h++;
                 error = false;
             } else {
                 error = true;
                 cout << "\nOpción no válida. Inténtelo de nuevo: \n";
             }
         } while (error);
+    	} while (h==0);
 }
 
 //Interfaz para el inicio de sesión
@@ -150,7 +163,7 @@ void sesionUsuario() {
     bool correcto = false;
     ifstream sm("Datos_de_los_clientes.txt", ios_base::in);
     if (!sm.is_open()) {
-        cout << "Error al abrir el archivo." << endl;
+        cout << "Primero regístrese." << endl;
         return;
     }
     else{
@@ -273,6 +286,7 @@ void registroUsuario() {
     
     cout << "Usuario Registrado\n";
     system("pause");
+    es <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
     es << x.usuario_Cliente << "|" << x.contrasena_Cliente << "|" << x.nombre_Cliente << "|" << x.apellidos_Cliente << "|" << x.documento_Cliente << "|" << x.puntos << "|" << x.consumo << "|" << endl;
     es.close();
     ms.close();
@@ -294,6 +308,7 @@ void interfazClientePrincipal(char x[]) {
             if (strcmp(aux.c_str(), x) == 0) {
                 encontrado = true;
                 // Leer el resto de los datos del cliente
+                strcpy(y.usuario_Cliente, x);
                 getline(dat, aux, '|'); // Leer la contraseña
                 getline(dat, aux, '|'); // Leer el nombre
                 strcpy(y.nombre_Cliente, aux.c_str());
@@ -326,7 +341,7 @@ void interfazClientePrincipal(char x[]) {
 		            	error = false;
 		            } else if (opciones == 2) {
 		                system("cls");
-		                //registroUsuario();
+		                interfazClienteCompra(y.usuario_Cliente);
 		                system("cls");
 		                error = false;
 		            } else if (opciones == 3) {
@@ -355,6 +370,7 @@ void interfazClientePrincipal(char x[]) {
     }
     dat.close();
 }
+
 
 //Interfaz para la carta
 void interfazcarta() {
@@ -395,6 +411,279 @@ void interfazcarta() {
         cout << "\n";
     }
     system("pause");
+}
+
+//Interfaz para la compra
+void interfazClienteCompra(char x[]){
+	cliente y;
+    polleria p;
+    menu carta[12] = {plato1, plato2, plato3, plato4, adicional1, adicional2, adicional3, adicional4, adicional5, bebida1, bebida2, bebida3};
+    int opciones, cant, nt, nl, x2;
+    float total = 0;
+    char s_n;
+    bool error, error2;
+    ifstream dat("Datos_de_los_clientes.txt", ios_base::in);
+
+    if (!dat.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        return;
+    } else {
+        nt = contarLineas(dat);
+        string aux[nt];
+        nl = buscarLinea(x, dat);
+        dat.clear();
+        dat.seekg(0);
+
+        for (int i = 0; i < (nl/2)-1; i++) {
+            getline(dat, aux[i]);
+            getline(dat, aux[i]);
+        }
+		getline(dat, aux[(nl/2)-1]);
+        getline(dat, aux[(nl/2)-1], '|');
+        strcpy(y.usuario_Cliente, aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer la contraseña
+        strcpy(y.contrasena_Cliente, aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer el nombre
+        strcpy(y.nombre_Cliente, aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer los apellidos
+        strcpy(y.apellidos_Cliente, aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer el documento
+        strcpy(y.documento_Cliente, aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer los puntos
+        y.puntos = atoi(aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1], '|'); // Leer el consumo
+        y.consumo = atoi(aux[(nl/2)-1].c_str());
+        getline(dat, aux[(nl/2)-1]);
+		
+
+        for (int i = (nl/2); i < (nt/2); i++) {
+            getline(dat, aux[i]);
+            getline(dat, aux[i]);
+        }
+
+		cout << left << setw(75) << "Platillos:" << right << setw(10) << "Precio:" << endl;
+	    cout << "\n";
+	    for (int j = 0; j < 4; j++) {
+	        cout << "Platillo " << j + 1 << ":" << endl;
+	        cout << left << setw(75) << setfill(' ') << carta[j].descripcion 
+	            << right << setw(7) << "S/." 
+	            << setw(4) << fixed << setprecision(2) << carta[j].precio << endl;
+	        cout << "\n";    
+	    }
+	    cout << "Seleccione el plato a comprar (1-4): "; 
+		cin>>opciones;
+		while (opciones<1 || opciones>4){
+			cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			cin>>opciones;
+			cout << "\n";
+		}
+	    cout << "Elija la cantidad: "; cin>>cant;
+	    total=carta[opciones-1].precio*cant;
+	    do {
+		    cout << "Desea otro platillo (s/n): ";
+		    do {
+		        cin>>s_n;;
+		        if ('S' == toupper(s_n)) {
+		        	cout << "Seleccione el plato a comprar: "<< endl;
+		        	cin>>opciones;
+		        	while (opciones<1 || opciones>4){
+					cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+					cin>>opciones;
+					cout << "\n";
+					}
+	    			cout << "Elija la cantidad: "; cin>>cant;
+	    			while (cant<1){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>cant;
+						cout << "\n";
+					}
+	   				total=carta[opciones-1].precio*cant + total;
+			    	error = false;
+			    	error2 = true;
+			    } else if ('N' == toupper(s_n)) {
+			        cout << endl;
+			        cout << endl;
+			        error = false;
+			        error2 = false;
+			    } else {
+			        error = true;
+			        cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			    }
+		    } while (error);
+		} while (error2);
+		
+		x2=0;
+		cout << left << setw(75) << "Adicional:" << right << setw(10) << "Precio:" << endl;
+	    cout << "\n";
+	    for (int j = 0; j < 5; j++) {
+	        cout << "Adicional " << j + 1 << ":" << endl;
+	        cout << left << setw(75) << setfill(' ') << carta[j+4].descripcion 
+	             << right << setw(7) << "S/." 
+	             << setw(4) << fixed << setprecision(2) << carta[j+4].precio << endl;
+	        cout << "\n";    
+	    }
+		do {
+			if(x2==0)
+		    cout << "¿Desea algún adicional? (s/n): ";
+		    else
+		    cout << "¿Desea algún adicional extra? (s/n): ";
+		    do {
+		        cin>>s_n;;
+		        if ('S' == toupper(s_n)) {
+		        	x2=1;
+		        	cout << "Seleccione el adicional a comprar: "<< endl;
+		        	cin>>opciones;
+		        	while (opciones<1 || opciones>5){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>opciones;
+						cout << "\n";
+					}
+	    			cout << "Elija la cantidad: "; cin>>cant;
+	    			while (cant<1){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>cant;
+						cout << "\n";
+					}
+	   				total=carta[opciones+3].precio*cant + total;
+			    	error = false;
+			    	error2 = true;
+			    } else if ('N' == toupper(s_n)) {
+			        cout << endl;
+			        error = false;
+			        error2 = false;
+			    } else {
+			        error = true;
+			        cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			    }
+		    } while (error);
+		} while (error2);
+	    
+	    x2=0;
+	    cout << left << setw(75) << "Bebidas:" << right << setw(10) << "Precio:" << endl;
+	    cout << "\n";
+	    for (int j = 0; j < 3; j++) {
+	        cout << "Bebida " << j + 1 << ":" << endl;
+	        cout << left << setw(75) << setfill(' ') << carta[j+9].descripcion 
+	            << right << setw(7) << "S/." 
+	            << setw(4) << fixed << setprecision(2) << carta[j+9].precio << endl;
+	        cout << "\n";    
+	    }
+		do {
+		    if(x2==0)
+		    cout << "¿Desea alguna bebida? (s/n): ";
+		    else
+		    cout << "¿Desea alguna bebida adicional? (s/n): ";
+		    do {
+		        cin>>s_n;;
+		        if ('S' == toupper(s_n)) {
+		        	x2=1;
+		        	cout << "Seleccione la bebidad a comprar: "<< endl;
+		        	cin>>opciones;
+		        	while (opciones<1 || opciones>3){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>opciones;
+						cout << "\n";
+					}
+	    			cout << "Elija la cantidad: "; cin>>cant;
+	    			while (cant<1){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>cant;
+						cout << "\n";
+					}
+	   				total=carta[opciones+8].precio*cant + total;
+			    	error = false;
+			    	error2 = true;
+			    } else if ('N' == toupper(s_n)) {
+			        cout << endl;
+			        error = false;
+			        error2 = false;
+			    } else {
+			        error = true;
+			        cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			    }
+		    } while (error);
+		} while (error2);
+		cout << "El total es de: S/."<< fixed << setprecision(2) << total << endl;
+		if (total>=75)
+		y.puntos++;
+		y.consumo++;
+		cout << "¿Desea calificarnos? (s/n): ";
+		    do {
+		        cin>>s_n;;
+		        if ('S' == toupper(s_n)) {
+		        	x2=1;
+		        	cout << "Ingrese una puntuación del 1 al 5: "<< endl;
+		        	cin>>opciones;
+		        		while (opciones<1 || opciones>5){
+						cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+						cin>>opciones;
+						cout << "\n";
+					}
+			    	error = false;
+			    } else if ('N' == toupper(s_n)) {
+			        cout << endl;
+			        error = false;
+			    } else {
+			        error = true;
+			        cout << "\nOpción no válida. Inténtelo de nuevo: \n";
+			    }
+		    } while (error);
+		    copiarLineas(aux, y, nl/2, nt/2);
+    }
+    dat.close();
+    cout << "Compra realizada con éxito \n";
+    system("pause");
+}	
+
+int contarLineas(ifstream &y){
+	int lineas = 0;
+	string aux;
+	while (!y.eof()){
+            getline(y, aux);
+            lineas ++;
+        }
+	return lineas-1;
+}
+
+void copiarLineas(string aux[], cliente y, int nl, int nt){
+	ofstream newdat("Datos_de_los_clientes.txt", ios_base::trunc);
+    if (!newdat.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+    } else {
+    	for (int i = 0; i < nl-1; i++) {
+    		newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+            newdat << aux[i] << endl;
+        }
+        
+        newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+        newdat << y.usuario_Cliente << "|" << y.contrasena_Cliente << "|" << y.nombre_Cliente << "|" << y.apellidos_Cliente << "|" << y.documento_Cliente << "|" << y.puntos << "|" << y.consumo << "|" << endl;
+        
+		for (int i = nl; i < nt; i++) {
+        	newdat <<"USUARIO "<< "|" <<" CONTRASEÑA "<< "|" <<" NOMBRES " << "|" << " APELLIDOS "<< "|" << " DOCUMENTO " << "|" << " PUNTOS " <<"|" << " CONSUMO " <<"|" << endl;
+            newdat << aux[i] << endl;
+    	}
+}
+}
+
+int buscarLinea(char x[], ifstream &y) {
+    int lineas = 0;
+    string aux;
+    bool encontrado = false;
+    y.clear(); // Resetea las flags de eofbit, failbit y badbit
+    y.seekg(0); // Vuelve al inicio del archivo
+    while (!y.eof() && !encontrado) {
+        getline(y, aux, '|');
+        if (strcmp(aux.c_str(), x) == 0) {
+            encontrado = true;
+        } else {
+            getline(y, aux);
+        }
+        lineas++;
+    }
+    if (encontrado = true)
+    return lineas;
+    else
+    return -1; // Devuelve -1 si no se encontró la línea
 }
 
 //Función para comprobar la longitud y el uso de algunos caracteres
