@@ -884,6 +884,7 @@ bool actualizardatosP(polleria p, char s){
 	}
 }
 
+//Función para actualizar stock
 bool actualizarStock(float z[], stock x[]){
 	string aux;
 	stock paux[10];
@@ -923,6 +924,7 @@ bool actualizarStock(float z[], stock x[]){
 	}
 }
 
+//Procedimiento para actualizar los datos del cliente
 void copiarLineas(string aux[], cliente y, int nl, int nt){
 	ofstream newdat("Datos_de_los_clientes.txt", ios_base::trunc);
     if (!newdat.is_open()) {
@@ -944,6 +946,7 @@ void copiarLineas(string aux[], cliente y, int nl, int nt){
 	newdat.close();
 }
 
+//Función para ubicar la linea que se desea editar
 int buscarLinea(char x[], ifstream &y) {
     int lineas = 0;
     string aux;
@@ -965,6 +968,7 @@ int buscarLinea(char x[], ifstream &y) {
     return -1; // Devuelve -1 si no se encontró la línea
 }
 
+//Procedimiento para el uso de los puntos
 void puntosD(cliente &x, float &total) {
 	bool error;
 	int aux, op;
@@ -1006,6 +1010,7 @@ void puntosD(cliente &x, float &total) {
 		    } while (error);
 }
 
+//Procedimiento para el uso de los puntos
 void pedido(cliente x, float total, int p[], menu carta[]) {
 
 	ofstream newdat("Pedidos.txt", ios_base::app);
@@ -1070,7 +1075,7 @@ bool comprobarcarac(char x[], int n) {
     }
 }
 
-
+//Función para comprobar si existe el usuario de los gerentes
 bool existeArchivo(){
 	trabajador y[2] = {trabajador1 , trabajador2};
 	ifstream datp("Datos_de_los_trabajadores.txt", ios_base::in);
@@ -1093,6 +1098,7 @@ bool existeArchivo(){
 	}  
 }
 
+//Interfaz para iniciar sesión para trabajadores
 void interfazTrabajador() {
     int opciones;
     bool error = false;
@@ -1115,6 +1121,7 @@ void interfazTrabajador() {
         } while (error);
 }
 
+//Interfaz para ingresar el usuario y la contraseña
 void interfazsesionTrabajador(){
 	trabajador y;
 	trabajador z[2] = {trabajador1 , trabajador2};
@@ -1184,6 +1191,7 @@ void interfazsesionTrabajador(){
 	}
 }
 
+//Interfaz para los trabajadores
 void interfazPrincipalTrabajador(char x[]) {
     trabajador y;
     string aux;
@@ -1261,6 +1269,7 @@ void interfazPrincipalTrabajador(char x[]) {
     }
 }
 
+//Interfaz para los gerentes
 void interfazPrincipalGerente(char x[]) {
        trabajador y;
     string aux;
@@ -1348,6 +1357,7 @@ void interfazPrincipalGerente(char x[]) {
     }
 }
 
+//Interfaz para el registro de nuevos trabajadores
 void registroTrabajador() {
     ofstream es("Datos_de_los_trabajadores.txt", ios_base::app);
     if (!es.is_open()) {
@@ -1425,6 +1435,7 @@ void registroTrabajador() {
     ms.close();
 }
 
+//Función que edita el stock
 bool editStock() {
 	string aux;
 	stock paux[10];
@@ -1488,6 +1499,7 @@ bool editStock() {
 	}
 }
 
+//Interfaz que muestra los pedidos
 void infoPedidos() {
 	string aux;
 	int nt;
@@ -1508,6 +1520,7 @@ void infoPedidos() {
 	}
 }
 
+//Interfaz que muestra la información de los trabajadores
 void infoTrabajadores() {
 	string aux;
 	int nt;
@@ -1541,6 +1554,7 @@ void infoTrabajadores() {
 	}
 }
 
+//Interfaz que muestra las ganancias, puntuanción y cantidad de puntajes
 void infoPolleria() {
 	string aux;
     ifstream dat("Datos_de_la_polleria.txt", ios_base::in);
