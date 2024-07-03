@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//Datos del cliente
 struct cliente {
     char nombre_Cliente[30];
     char apellidos_Cliente[30];
@@ -19,6 +20,7 @@ struct cliente {
     int consumo;
 };
 
+//Datos reales de la polleria
 struct infoPolleria {
   	char nombre[30];
     char direccion[40];
@@ -27,12 +29,14 @@ struct infoPolleria {
 }polleria1 = {"POLLERIA RAMY'S'","Av. Los Pinos 1805 - San Miguel", "POLLERIA RAMY'S S.R.L'", "20512365934"};
 
 
+//Datos de la polleria dentro del programa
 struct polleria {
 	float ingresos;
 	float puntaje;
     int cantpuntaje;
 };
 
+//Datos de los platillos
 struct menu {
     int numero;
     char descripcion[75];
@@ -50,6 +54,7 @@ struct menu {
   bebida2 = {11, "LIMONADA FROZEN 1L", 7.90},
   bebida3 = {12, "CHICHA MORADA 1L", 7.90};
 
+//Datos de los trabajadores
 struct trabajador {
     char nombre_Trabajador[30];
     char apellidos_Trabajador[30];
@@ -61,6 +66,7 @@ struct trabajador {
 } trabajador1 = {"Luis Alfredo","Paredes Quintana", "32356489", "Luisparqui", "12345670", "Gerente"},
   trabajador2 = {"Claudia Elisa","Vargas Lopez", "56236979", "Clauvarlop", "12345671", "Subgerente"};
 
+//Datos de los insumos
 struct stock {
     char nomProducto[20];
     float cantidad;
@@ -763,6 +769,7 @@ void interfazClienteCompra(char x[]){
     system("pause");
 }	
 
+//Función para contar las lineas de un archivo
 int contarLineas(ifstream &y){
 	int lineas = 0;
 	string aux;
@@ -773,6 +780,7 @@ int contarLineas(ifstream &y){
 	return lineas-1;
 }
 
+//Función para generar una boleta
 void boleta(cliente x, float total, int p[], menu carta[]){
 	string aux, aux2, us, us2;
 	bool existe;
