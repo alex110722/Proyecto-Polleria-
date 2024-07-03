@@ -827,6 +827,7 @@ void boleta(cliente x, float total, int p[], menu carta[]){
 	}
 }
 
+//Función para actualizar las ganancias, puntaje, y la cantidad de puntajes
 bool actualizardatosP(polleria p, char s){
 	string aux;
 	polleria paux;
